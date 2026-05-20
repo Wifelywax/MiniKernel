@@ -9,7 +9,7 @@
 #define MAX_QUEUE_SIZE 100
 
 typedef struct Queue {
-   pcb_t* buffer[MAX_QUEUE_SIZE];
+   pcb_t buffer[MAX_QUEUE_SIZE];
    int head;
    int tail;
    int count;
@@ -20,7 +20,7 @@ typedef struct Queue {
 } Queue;    
 
 void queue_init(Queue* q);
-void queue_enqueue(Queue* q, pcb_t* process);
-void queue_dequeue(Queue* q)
+void queue_enqueue(Queue* q, pcb_t process);
+pcb_t queue_dequeue(Queue* q);
 
 #endif 

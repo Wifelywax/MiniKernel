@@ -7,13 +7,13 @@
 #define STATE_RUNNING 2
 #define STATE_TERMINATED 3
 
-typedef struct PCB {
+typedef struct {
     int pid;
-    int cpu_burst_time; 
+    int burst_time; 
     int remaining_time; 
     int priority; 
     int arrival_time;
     int state; 
-} PCB;
+} pcb_t;
 
 #endif 

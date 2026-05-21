@@ -9,7 +9,7 @@
 #define NUM_CPUS 2   //CPUs Virtuales
 
 
-queue_ready_queue; //Cola de listos 
+Queue ready_queue; //Cola de listos 
 int process_count = 0;
 
 extern void* cpu_scheduler(void* arg); //Declaracion del scheduler
@@ -17,7 +17,6 @@ extern void* cpu_scheduler(void* arg); //Declaracion del scheduler
 
 //Cola Compartida 
 Queue ready_queue;
-int process_count = 0;
 
 void* process_generator(void* arg) {
     while (1) {
@@ -46,7 +45,7 @@ void* process_generator(void* arg) {
         
         new_process.state = STATE_READY;
 
-        printf("Generated Process: PID=%d, Burst Time=%d, Arrival Time=%ld, Priority=%d\n", 
+        printf("Generated Process: PID=%d, Burst Time=%d, Arrival Time=%d, Priority=%d\n", 
                new_process.pid, new_process.burst_time, new_process.arrival_time, new_process.priority);
 
         //Insercion en la cola de listos        
@@ -99,37 +98,5 @@ int main() {
 
     //Hilo main en espera
     pthread_join(generator_thread, NULL);
-    return 0;
-}
-
-
-int main(){
-    srand(time(NULL)); // # aleatorios
-    queue_init(&ready_queue); //Inicializar cola de listos
-
-    pthread_t generator_thread;
-
-    pthread_t cpu_threads[NUM_CPUS]; //Guardar hilos CPU
-
-    printf("Iniciando el MINIKERNEL con %d CPUs virtuales\n", NUM_CPUS);
-
-    //Verificar creación de hilos CPU( 4 parametros)
-    if(pthread_create(&generator_thread, NULL, process_generator, NULL) != 0) {
-        perror("Error al crear hilo generador");
-        return 1;
-    }
-    //Encendido de CPUs virtuales
-    for(int i = 0; i < NUM_CPUS; i++) {
-
-        int* cpu_id = malloc(sizeof(int)); //ID para cada CPU
-        *cpu_id = i; //Asignar ID
-
-        if(pthread_create(&cpu_threads[i], NULL, cpu_scheduler, cpu_id) != 0) {
-            perror("Error al crear hilo CPU");
-            return 1;
-        }
-    }   
-    pthread_join(generator_thread, NULL); //Esperar hilo generador
-    
     return 0;
 }

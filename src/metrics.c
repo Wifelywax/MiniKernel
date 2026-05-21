@@ -19,7 +19,6 @@ void record_first_response_time(int arrival_time) {
 
     pthread_mutex_lock(&metrics_mutex);
    
-    int current_time = time(NULL);
     int response_time = time(NULL) - arrival_time; //Tiempo de respuesta
     
 

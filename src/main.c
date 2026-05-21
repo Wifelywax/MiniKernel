@@ -5,6 +5,16 @@
 #include <time.h>
 #include "../include/queue.h"
 
+
+#define NUM_CPUS 2   //CPUs Virtuales
+
+
+queue_ready_queue; //Cola de listos 
+int process_count = 0;
+
+extern void* cpu_scheduler(void* arg); //Declaracion del scheduler
+
+
 //Cola Compartida 
 Queue ready_queue;
 int process_count = 0;
@@ -67,5 +77,37 @@ int main() {
 
     //Hilo main en espera
     pthread_join(generator_thread, NULL);
+    return 0;
+}
+
+
+int main(){
+    srand(time(NULL)); // # aleatorios
+    queue_init(&ready_queue); //Inicializar cola de listos
+
+    pthread_t generator_thread;
+
+    pthread_t cpu_threads[NUM_CPUS]; //Guardar hilos CPU
+
+    printf("Iniciando el MINIKERNEL con %d CPUs virtuales\n", NUM_CPUS);
+
+    //Verificar creación de hilos CPU( 4 parametros)
+    if(pthread_create(&generator_thread, NULL, process_generator, NULL) != 0) {
+        perror("Error al crear hilo generador");
+        return 1;
+    }
+    //Encendido de CPUs virtuales
+    for(int i = 0; i < NUM_CPUS; i++) {
+
+        int* cpu_id = malloc(sizeof(int)); //ID para cada CPU
+        *cpu_id = i; //Asignar ID
+
+        if(pthread_create(&cpu_threads[i], NULL, cpu_scheduler, cpu_id) != 0) {
+            perror("Error al crear hilo CPU");
+            return 1;
+        }
+    }   
+    pthread_join(generator_thread, NULL); //Esperar hilo generador
+    
     return 0;
 }

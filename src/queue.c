@@ -14,7 +14,7 @@ void queue_init(Queue* q) {
     pthread_cond_init(&q->not_full, NULL);
 }
 
-/*---INSERTAR EN CC---*/
+/*INSERTAR EN CC*/
 
 void queue_enqueue(Queue* q, pcb_t process) {
     pthread_mutex_lock(&q->mutex);  //Candado
@@ -34,7 +34,7 @@ void queue_enqueue(Queue* q, pcb_t process) {
     pthread_mutex_unlock(&q->mutex);
 }   
 
-/*---ELIMINAR DE CC---*/
+/*ELIMINAR DE CC*/
 
 pcb_t queue_dequeue(Queue* q) {
     pthread_mutex_lock(&q->mutex); 

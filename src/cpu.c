@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
+#include "../include/metrics.h"
 #include "../include/queue.h"
 
 #define Quantum 3   //Quantum RR
@@ -16,6 +17,16 @@ void* cpu_scheduler(void* arg){
     while(1){
        
         pcb_t process = queue_dequeue(&ready_queue); //Sacar proceso, si CC vacia, duerme.
+
+        if(process.remaining_time == process.burst_time){
+            //Primer respuesta
+            record_first_response_time(process.arrival_time);
+        } else {
+            process.state = 3; // Terminated
+            printf("CPU %d: Process PID=%d finalizado.\n", 
+                cpu_id, process.pid);
+            record_completion_time(); 
+        }
 
         process.state = 2; // Running
         printf("CPU %d: Running Process PID=%d, Burst Time=%d, Remaining Time=%d, Priority=%d\n",  

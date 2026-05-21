@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <time.h>
 #include "../include/queue.h"
-
+#include "../include/metrics.h"
 
 #define NUM_CPUS 2   //CPUs Virtuales
 
@@ -64,14 +64,36 @@ int main() {
     //Inicializar la cola de listos
     queue_init(&ready_queue);
 
-    //Declarar hilo generador 
-    pthread_t generator_thread;
+    metrics_init(); //Inicializar métricas
 
-   printf("///Iniciando el MINIKERNEL///\n");
+    pthread_t generator_thread;  //Declarar hilo generador 
+    pthread_t cpu_threads[NUM_CPUS]; //Guardar hilos CPU
 
-    //Crear y ejecutar el hilo generador
+    pthread_t metrics_thread;
+
+   printf("///Iniciando el MINIKERNE con %d CPUs virtuales///\n", NUM_CPUS);
+
+
+    //Ejecutar el hilo generador
     if(pthread_create(&generator_thread, NULL, process_generator, NULL) != 0) {
         perror("Error al crear hilo generador");
+        return 1;
+    }
+
+    //Ejecutar hilos CPU virtuales
+    for(int i=0; i<NUM_CPUS; i++){
+        int* cpu_id= malloc(sizeof(int));
+        *cpu_id = i+1;
+
+        if(pthread_create(&cpu_threads[i], NULL, cpu_scheduler, cpu_id) != 0){
+            perror("Error al crear hilo CPU");
+            return 1;
+        }
+    }
+
+    //Ejecutar hilo de métricas
+    if(pthread_create(&metrics_thread, NULL, metrics_monitor, NULL) != 0) {
+        perror("Error al crear hilo de métricas");
         return 1;
     }
 

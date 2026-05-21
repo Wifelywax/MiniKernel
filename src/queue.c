@@ -17,7 +17,7 @@ void queue_init(Queue* q) {
 /*INSERTAR EN CC*/
 
 void queue_enqueue(Queue* q, pcb_t process) {
-    pthread_mutex_lock(&q->mutex);  //Candado
+    pthread_mutex_lock(&q->mutex);  //Candado (Evitar condiciones de carrera)
 
     // Esperar si la cola está llena
     while (q->count == MAX_QUEUE_SIZE) {

@@ -8,7 +8,7 @@ void queue_init(Queue* q) {
     q->tail = 0;
     q->count = 0;
 
-    //Inicializar mutex y condiciones
+    //Inicializar mutex y condiciones para seccion critica
     pthread_mutex_init(&q->mutex, NULL);
     pthread_cond_init(&q->not_empty, NULL);
     pthread_cond_init(&q->not_full, NULL);
@@ -17,9 +17,11 @@ void queue_init(Queue* q) {
 /*INSERTAR EN CC*/
 
 void queue_enqueue(Queue* q, pcb_t process) {
-    pthread_mutex_lock(&q->mutex);  //Candado (Evitar condiciones de carrera)
 
-    // Esperar si la cola está llena
+    //Bloque: Si la cola está llena (Prevee condicion de carrera)
+    pthread_mutex_lock(&q->mutex);  
+
+    // Espera solo si la cola está llena
     while (q->count == MAX_QUEUE_SIZE) {
         pthread_cond_wait(&q->not_full, &q->mutex);
     }
@@ -29,14 +31,18 @@ void queue_enqueue(Queue* q, pcb_t process) {
     q->tail = (q->tail + 1) % MAX_QUEUE_SIZE;
     q->count++;
 
-    // Señalar que la cola no está vacía
+   
     pthread_cond_signal(&q->not_empty);
+
+    //Desbloqueo: Se libera la seccion critica (Para otros hilos)
     pthread_mutex_unlock(&q->mutex);
 }   
 
 /*ELIMINAR DE CC*/
 
 pcb_t queue_dequeue(Queue* q) {
+
+    
     pthread_mutex_lock(&q->mutex); 
 
    
@@ -51,6 +57,8 @@ pcb_t queue_dequeue(Queue* q) {
 
     // Señalar que la cola no está llena
     pthread_cond_signal(&q->not_full);
+
+    
     pthread_mutex_unlock(&q->mutex);
 
     return process;

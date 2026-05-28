@@ -6,8 +6,8 @@
 #include <pthread.h>
 
 void metrics_init();
-void record_first_response_time(int arrival_time); //Tiempo de respuesa
+void record_first_response_time(int arrival_time); 
 void record_completion_time(); //Datos Throughput
-void* metrics_monitor (void* arg); //Hilo de monitoreo de métricas
+void* metrics_monitor (void* arg);
 
 #endif
